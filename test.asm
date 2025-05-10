@@ -42,7 +42,6 @@ INCLUDE Irvine32.inc
                  BYTE "Press M to return to menu", 0ah, 0
 
     ; Level 1 maze (60x25, ~100 pellets, roll number 2583)
-    ; Mutable data because pellets need to be eaten ('.' replaced with ' ')
     level1Maze BYTE "============================================================", 0ah
            BYTE "|                                                          |", 0ah
            BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
@@ -67,24 +66,66 @@ INCLUDE Irvine32.inc
            BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
            BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
            BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   ####   #### ####   ####   #### ####   ####   ######    |", 0ah
+           BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
            BYTE "============================================================", 0ah, 0
+
+
+level2Maze BYTE "============================================================", 0ah
+           BYTE "|                                                          |", 0ah
+           BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
+           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
+           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
+           BYTE "|   #  #   #       #   #  #   #       #   #  #   #     #   |", 0ah
+           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
+           BYTE "|          #       #          #       #          #     #   |", 0ah
+           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
+           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
+           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
+           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
+           BYTE "|   ####   #### ####   ####   #### ####   ####   ######    |", 0ah
+           BYTE "|                                                          |", 0ah
+           BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
+           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
+           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
+           BYTE "|   #  #   #       #   #  #   #       #   #  #   #     #   |", 0ah
+           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
+           BYTE "|          #       #          #       #          #     #   |", 0ah
+           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
+           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
+           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
+           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
+           BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
+           BYTE "============================================================", 0ah, 0
+
+
+
+
 
     ; Player variables
     playerX BYTE 30  ; Starting position (30,12)
     playerY BYTE 12
     inputChar BYTE 0
 
+    ; Ghost variables
+    ghostX BYTE 30   ; First ghost at (30,8)
+    ghostY BYTE 8
+    ghost2X BYTE 15  ; Second ghost at (15,8)
+    ghost2Y BYTE 8
+    ghost3X BYTE 45  ; Third ghost at (45,8)
+    ghost3Y BYTE 8
+
+    lives DWORD 3    ; Player lives
+    livesMsg BYTE "Lives: ", 0
+    gameOverMsg BYTE "Game Over! Press any key to exit.", 0
     score DWORD 0    ; Player score
+    scoreMsg BYTE "Score: ", 0
 
 .code
 ; Procedure to display welcome screen and get player's name
 displayWelcome PROC
     push ebp
     mov ebp, esp
-    ; Clear screen
     call Clrscr
-    ; Display title in yellow
     mov eax, yellow
     call SetTextColor
     mov dl, 20
@@ -92,27 +133,25 @@ displayWelcome PROC
     call Gotoxy
     mov edx, OFFSET titleMsg
     call WriteString
-    ; Blinking prompt
-    blinkLoop:
-        mov dl, 20
-        mov dh, 13
-        call Gotoxy
-        mov eax, white
-        call SetTextColor
-        mov edx, OFFSET promptMsg
-        call WriteString
-        mov eax, 500
-        call Delay
-        mov dl, 20
-        mov dh, 13
-        call Gotoxy
-        mov edx, OFFSET blankMsg
-        call WriteString
-        mov eax, 500
-        call Delay
-        call ReadKey
-        jz blinkLoop
-    ; Prompt for name
+blinkLoop:
+    mov dl, 20
+    mov dh, 13
+    call Gotoxy
+    mov eax, white
+    call SetTextColor
+    mov edx, OFFSET promptMsg
+    call WriteString
+    mov eax, 500
+    call Delay
+    mov dl, 20
+    mov dh, 13
+    call Gotoxy
+    mov edx, OFFSET blankMsg
+    call WriteString
+    mov eax, 500
+    call Delay
+    call ReadKey
+    jz blinkLoop
     call Clrscr
     mov dl, 20
     mov dh, 10
@@ -140,34 +179,28 @@ menu_loop:
     call WriteString
     mov edx, OFFSET playerName
     call WriteString
-    ; New line after Welcome, <name>
     mov eax, 13
     call WriteChar
     mov edx, OFFSET menuOptions
     call WriteString
-
     call ReadChar
-    mov al, al           ; input in AL
+    mov al, al
     cmp al, '1'
     je start_game
     cmp al, '2'
     je show_instructions
     cmp al, '3'
     je show_highscores
-    jmp menu_loop        ; Invalid input, loop menu
-
+    jmp menu_loop
 start_game:
     pop ebp
     ret
-
 show_instructions:
     call displayInstructions
     jmp menu_loop
-
 show_highscores:
     call displayHighScores
     jmp menu_loop
-
 displayMainMenu ENDP
 
 ; Procedure to display instructions screen
@@ -179,7 +212,6 @@ instr_loop:
     mov edx, OFFSET instrMsg
     call WriteString
     call ReadChar
-    ; Wait for B or b to return to menu
     cmp al, 'B'
     je done_instr
     cmp al, 'b'
@@ -199,7 +231,6 @@ highscores_loop:
     mov edx, OFFSET highScoreMsg
     call WriteString
     call ReadChar
-    ; Wait for M or m to return to menu
     cmp al, 'M'
     je done_scores
     cmp al, 'm'
@@ -214,11 +245,9 @@ displayHighScores ENDP
 displayLevel PROC
     push ebp
     mov ebp, esp
-    ; Set cursor to (0,1) for maze
     mov dl, 0
     mov dh, 1
     call Gotoxy
-    ; Set green for walls and pellets
     mov eax, green
     call SetTextColor
     mov edx, OFFSET level1Maze
@@ -253,20 +282,18 @@ clearPlayer ENDP
 isValidMove PROC
     push ebp
     mov ebp, esp
-    ; Calculate the maze index based on coordinates
-    movzx eax, playerY  ; Zero-extend playerY into eax
+    movzx eax, playerY
     sub eax, 1
-    imul eax, 61         ; Each row is 60 chars + newline
-    movzx edx, playerX   ; Zero-extend playerX into edx
+    imul eax, 61
+    movzx edx, playerX
     add eax, edx
-    mov dl, level1Maze[eax]  ; Get char at target position
-    cmp dl, '#'             ; Wall
+    mov dl, level1Maze[eax]
+    cmp dl, '#'
     je invalid
-    cmp dl, '|'             ; Wall boundary
+    cmp dl, '|'
     je invalid
-    cmp dl, '='             ; Wall boundary
+    cmp dl, '='
     je invalid
-    ; Allow spaces and pellets '.'
     mov eax, 1
     jmp done
 invalid:
@@ -280,38 +307,26 @@ isValidMove ENDP
 displayScore PROC
     push ebp
     mov ebp, esp
-
-    ; Position cursor under maze (row 27, col 0)
     mov dl, 0
     mov dh, 27
     call Gotoxy
-
-    ; Set color cyan for score display
     mov eax, cyan
     call SetTextColor
-
     mov edx, OFFSET scoreMsg
     call WriteString
-
-    ; Convert score DWORD to string and display
     mov eax, score
     call WriteDec
-
-    ; Reset color white
     mov eax, white
     call SetTextColor
-
     pop ebp
     ret
 displayScore ENDP
-
-scoreMsg BYTE "Score: ", 0
 
 ; Procedure to move player and handle pellet eating
 movePlayer PROC
     call clearPlayer
 
-    ; Save old playerX, playerY for validating move & checking maze char
+    ; Check input and move accordingly
     mov al, inputChar
     cmp al, 'w'
     je moveUp
@@ -321,7 +336,7 @@ movePlayer PROC
     je moveLeft
     cmp al, 'd'
     je moveRight
-    jmp done
+    jmp doneMove
 
 moveUp:
     dec playerY
@@ -331,7 +346,7 @@ moveUp:
     jmp check_pellets
 undoMoveUp:
     inc playerY
-    jmp done
+    jmp doneMove
 
 moveDown:
     inc playerY
@@ -341,7 +356,7 @@ moveDown:
     jmp check_pellets
 undoMoveDown:
     dec playerY
-    jmp done
+    jmp doneMove
 
 moveLeft:
     dec playerX
@@ -351,7 +366,7 @@ moveLeft:
     jmp check_pellets
 undoMoveLeft:
     inc playerX
-    jmp done
+    jmp doneMove
 
 moveRight:
     inc playerX
@@ -361,53 +376,405 @@ moveRight:
     jmp check_pellets
 undoMoveRight:
     dec playerX
+    jmp check_pellets
 
 check_pellets:
-    ; Calculate maze index for current player position
+    ; Check for pellet at new position
     movzx eax, playerY
     sub eax, 1
     imul eax, 61
     movzx edx, playerX
     add eax, edx
-
-    ; get character at maze position
     mov bl, level1Maze[eax]
-
     cmp bl, '.'
-    jne skip_eat
-
-    ; Eat pellet: replace '.' with ' ' in maze
+    jne check_collisions
     mov byte ptr level1Maze[eax], ' '
-
-    ; Increase score by 5
     add score, 5
 
-skip_eat:
-    call displayPlayer
-    ret
+check_collisions:
+    ; Check collision with Ghost 1
+    mov bl, playerX
+    cmp bl, ghostX
+    jne check_ghost2
+    mov bl, playerY
+    cmp bl, ghostY
+    jne check_ghost2
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneMove
 
-done:
+check_ghost2:
+    ; Check collision with Ghost 2
+    mov bl, playerX
+    cmp bl, ghost2X
+    jne check_ghost3
+    mov bl, playerY
+    cmp bl, ghost2Y
+    jne check_ghost3
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneMove
+
+check_ghost3:
+    ; Check collision with Ghost 3
+    mov bl, playerX
+    cmp bl, ghost3X
+    jne no_collision
+    mov bl, playerY
+    cmp bl, ghost3Y
+    jne no_collision
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+
+no_collision:
+doneMove:
     call displayPlayer
     ret
 movePlayer ENDP
 
+; Procedure to display ghosts
+displayGhost PROC
+    mov dl, ghostX
+    mov dh, ghostY
+    call Gotoxy
+    mov eax, red + (black SHL 4)
+    call SetTextColor
+    mov al, 'G'
+    call WriteChar
+    mov dl, ghost2X
+    mov dh, ghost2Y
+    call Gotoxy
+    mov eax, magenta + (black SHL 4)
+    call SetTextColor
+    mov al, 'G'
+    call WriteChar
+    mov dl, ghost3X
+    mov dh, ghost3Y
+    call Gotoxy
+    mov eax, cyan + (black SHL 4)
+    call SetTextColor
+    mov al, 'G'
+    call WriteChar
+    mov eax, white
+    call SetTextColor
+    ret
+displayGhost ENDP
+
+; Procedure to clear ghosts
+clearGhost PROC
+    mov dl, ghostX
+    mov dh, ghostY
+    call Gotoxy
+    mov al, ' '
+    call WriteChar
+    mov dl, ghost2X
+    mov dh, ghost2Y
+    call Gotoxy
+    mov al, ' '
+    call WriteChar
+    mov dl, ghost3X
+    mov dh, ghost3Y
+    call Gotoxy
+    mov al, ' '
+    call WriteChar
+    ret
+clearGhost ENDP
+
+; Procedure to move ghosts
+moveGhost PROC
+    pushad
+    call clearGhost
+    mov al, ghostX
+    cmp al, playerX
+    je checkY1
+    jl moveRight1
+    jg moveLeft1
+checkY1:
+    mov al, ghostY
+    cmp al, playerY
+    je handleCollision1
+    jl moveDown1
+    jg moveUp1
+    jmp doneGhost1
+handleCollision1:
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneGhost1
+moveRight1:
+    inc ghostX
+    call isValidGhostMove
+    cmp eax, 0
+    je undoMoveRight1
+    jmp doneGhost1
+undoMoveRight1:
+    dec ghostX
+    jmp doneGhost1
+moveLeft1:
+    dec ghostX
+    call isValidGhostMove
+    cmp eax, 0
+    je undoMoveLeft1
+    jmp doneGhost1
+undoMoveLeft1:
+    inc ghostX
+    jmp doneGhost1
+moveUp1:
+    dec ghostY
+    call isValidGhostMove
+    cmp eax, 0
+    je undoMoveUp1
+    jmp doneGhost1
+undoMoveUp1:
+    inc ghostY
+    jmp doneGhost1
+moveDown1:
+    inc ghostY
+    call isValidGhostMove
+    cmp eax, 0
+    je undoMoveDown1
+    jmp doneGhost1
+undoMoveDown1:
+    dec ghostY
+doneGhost1:
+    popad
+    pushad
+    mov al, ghost2X
+    cmp al, playerX
+    je checkY2
+    jl moveRight2
+    jg moveLeft2
+checkY2:
+    mov al, ghost2Y
+    cmp al, playerY
+    je handleCollision2
+    jl moveDown2
+    jg moveUp2
+    jmp doneGhost2
+handleCollision2:
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneGhost2
+moveRight2:
+    inc ghost2X
+    call isValidGhost2Move
+    cmp eax, 0
+    je undoMoveRight2
+    jmp doneGhost2
+undoMoveRight2:
+    dec ghost2X
+    jmp doneGhost2
+moveLeft2:
+    dec ghost2X
+    call isValidGhost2Move
+    cmp eax, 0
+    je undoMoveLeft2
+    jmp doneGhost2
+undoMoveLeft2:
+    inc ghost2X
+    jmp doneGhost2
+moveUp2:
+    dec ghost2Y
+    call isValidGhost2Move
+    cmp eax, 0
+    je undoMoveUp2
+    jmp doneGhost2
+undoMoveUp2:
+    inc ghost2Y
+    jmp doneGhost2
+moveDown2:
+    inc ghost2Y
+    call isValidGhost2Move
+    cmp eax, 0
+    je undoMoveDown2
+    jmp doneGhost2
+undoMoveDown2:
+    dec ghost2Y
+doneGhost2:
+    popad
+    pushad
+    mov al, ghost3X
+    cmp al, playerX
+    je checkY3
+    jl moveRight3
+    jg moveLeft3
+checkY3:
+    mov al, ghost3Y
+    cmp al, playerY
+    je handleCollision3
+    jl moveDown3
+    jg moveUp3
+    jmp doneGhost3
+handleCollision3:
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneGhost3
+moveRight3:
+    inc ghost3X
+    call isValidGhost3Move
+    cmp eax, 0
+    je undoMoveRight3
+    jmp doneGhost3
+undoMoveRight3:
+    dec ghost3X
+    jmp doneGhost3
+moveLeft3:
+    dec ghost3X
+    call isValidGhost3Move
+    cmp eax, 0
+    je undoMoveLeft3
+    jmp doneGhost3
+undoMoveLeft3:
+    inc ghost3X
+    jmp doneGhost3
+moveUp3:
+    dec ghost3Y
+    call isValidGhost3Move
+    cmp eax, 0
+    je undoMoveUp3
+    jmp doneGhost3
+undoMoveUp3:
+    inc ghost3Y
+    jmp doneGhost3
+moveDown3:
+    inc ghost3Y
+    call isValidGhost3Move
+    cmp eax, 0
+    je undoMoveDown3
+    jmp doneGhost3
+undoMoveDown3:
+    dec ghost3Y
+doneGhost3:
+    popad
+    call displayGhost
+    ret
+moveGhost ENDP
+
+; Procedure to validate ghost 1 move
+isValidGhostMove PROC
+    push ebp
+    mov ebp, esp
+    movzx eax, ghostY
+    sub eax, 1
+    imul eax, 61
+    movzx edx, ghostX
+    add eax, edx
+    mov dl, level1Maze[eax]
+    cmp dl, '#'
+    je invalid_ghost
+    cmp dl, '|'
+    je invalid_ghost
+    cmp dl, '='
+    je invalid_ghost
+    mov eax, 1
+    jmp done_ghost
+invalid_ghost:
+    mov eax, 0
+done_ghost:
+    pop ebp
+    ret
+isValidGhostMove ENDP
+
+; Procedure to validate ghost 2 move
+isValidGhost2Move PROC
+    push ebp
+    mov ebp, esp
+    movzx eax, ghost2Y
+    sub eax, 1
+    imul eax, 61
+    movzx edx, ghost2X
+    add eax, edx
+    mov dl, level1Maze[eax]
+    cmp dl, '#'
+    je invalid_ghost2
+    cmp dl, '|'
+    je invalid_ghost2
+    cmp dl, '='
+    je invalid_ghost2
+    mov eax, 1
+    jmp done_ghost2
+invalid_ghost2:
+    mov eax, 0
+done_ghost2:
+    pop ebp
+    ret
+isValidGhost2Move ENDP
+
+; Procedure to validate ghost 3 move
+isValidGhost3Move PROC
+    push ebp
+    mov ebp, esp
+    movzx eax, ghost3Y
+    sub eax, 1
+    imul eax, 61
+    movzx edx, ghost3X
+    add eax, edx
+    mov dl, level1Maze[eax]
+    cmp dl, '#'
+    je invalid_ghost3
+    cmp dl, '|'
+    je invalid_ghost3
+    cmp dl, '='
+    je invalid_ghost3
+    mov eax, 1
+    jmp done_ghost3
+invalid_ghost3:
+    mov eax, 0
+done_ghost3:
+    pop ebp
+    ret
+isValidGhost3Move ENDP
+
+; Procedure to display lives at fixed position
+displayLives PROC
+    push ebp
+    mov ebp, esp
+    mov dl, 0
+    mov dh, 28
+    call Gotoxy
+    mov eax, yellow
+    call SetTextColor
+    mov edx, OFFSET livesMsg
+    call WriteString
+    mov eax, lives
+    call WriteDec
+    mov eax, white
+    call SetTextColor
+    pop ebp
+    ret
+displayLives ENDP
+
 main PROC
     call displayWelcome
-    call displayMainMenu  ; Show main menu and get user choice
-
+    call displayMainMenu 
 gameLoop:
-    call displayLevel      ; Display maze
-    call displayPlayer     ; Display player
-    call displayScore      ; Display score
-    call ReadChar          ; Read user input
+    call displayLevel
+    call displayGhost
+    call displayPlayer
+    call displayScore
+    call displayLives
+    call ReadChar
     mov inputChar, al
-    cmp inputChar, 'x'     ; Exit on 'x'
+    cmp inputChar, 'x'
     je exitGame
-    call movePlayer        ; Move player and handle eating
+    call movePlayer
+    call moveGhost
+    cmp lives, 0
+    je gameOver
     jmp gameLoop
-
+gameOver:
+    call Clrscr
+    mov edx, OFFSET gameOverMsg
+    call WriteString
+    call ReadKey
 exitGame:
     call Clrscr
     exit
 main ENDP
+
 END main
