@@ -111,7 +111,7 @@ INCLUDE Irvine32.inc
            BYTE "########## . #########     ##     ....            ...  ######   ########### . ##########", 0ah
            BYTE "########## . #########                                  ...     ########### . ##########", 0ah
            BYTE "########## . #########                                          ########### . ##########", 0ah
-           BYTE " .........                      ########################        ...........             ", 0ah
+           BYTE " .........                     ########################        ...........             ", 0ah
            BYTE "########## . #########                                          ########### . ##########", 0ah
            BYTE "########## . #########                                ####      ########### . ##########", 0ah
            BYTE "########## . #########      ############              .. #      ########### . ##########", 0ah
@@ -140,6 +140,8 @@ INCLUDE Irvine32.inc
     playerX BYTE 30  ; Starting position (30,12)
     playerY BYTE 12
     inputChar BYTE 0
+    lastInput BYTE 'd'  ; Default starting direction (right)
+    playerMoveCounter DWORD 0  ; Counter for player movement frequency
 
     ; Ghost variables
     ghostX BYTE 30   ; First ghost at (30,8)
@@ -151,12 +153,22 @@ INCLUDE Irvine32.inc
 
     lives DWORD 3    ; Player lives
     livesMsg BYTE "Lives: ", 0
-    gameOverMsg BYTE "Game Over! Press/Press any key to exit.", 0
+    gameOverMsg BYTE "Game Over! Press any key to exit.", 0
     score DWORD 0    ; Player score
     currentLevel BYTE 1  ; Tracks current level (1, 2, or 3)
     scoreMsg BYTE "Score: ", 0
+    randomSeed DWORD ?   ; For random number generator
+    moveCounter DWORD 0  ; Counter for ghost movement frequency
 
 .code
+; Initialize random seed
+initRandom PROC
+    push eax
+    call Randomize
+    pop eax
+    ret
+initRandom ENDP
+
 ; Procedure to display welcome screen and get player's name
 displayWelcome PROC
     push ebp
@@ -635,175 +647,159 @@ clearGhost PROC
     ret
 clearGhost ENDP
 
-; Procedure to move ghosts
+; Procedure to move ghosts randomly
 moveGhost PROC
     pushad
     call clearGhost
-    mov al, ghostX
-    cmp al, playerX
-    je checkY1
-    jl moveRight1
-    jg moveLeft1
-checkY1:
-    mov al, ghostY
-    cmp al, playerY
-    je handleCollision1
-    jl moveDown1
-    jg moveUp1
-    jmp doneGhost1
-handleCollision1:
-    dec lives
-    mov playerX, 30
-    mov playerY, 12
-    jmp doneGhost1
-moveRight1:
-    inc ghostX
-    call isValidGhostMove
+    inc moveCounter
+    cmp moveCounter, 5   ; Move every 5th loop (~100ms)
+    jb skipGhostMove
+    mov moveCounter, 0   ; Reset counter
+
+    ; Move Ghost 1
+    call Random32
+    and eax, 3           ; Random 0-3 (up, down, left, right)
     cmp eax, 0
-    je undoMoveRight1
-    jmp doneGhost1
-undoMoveRight1:
-    dec ghostX
-    jmp doneGhost1
-moveLeft1:
-    dec ghostX
-    call isValidGhostMove
-    cmp eax, 0
-    je undoMoveLeft1
-    jmp doneGhost1
-undoMoveLeft1:
-    inc ghostX
-    jmp doneGhost1
-moveUp1:
+    je tryUp1
+    cmp eax, 1
+    je tryDown1
+    cmp eax, 2
+    je tryLeft1
+    jmp tryRight1
+tryUp1:
     dec ghostY
     call isValidGhostMove
     cmp eax, 0
-    je undoMoveUp1
+    je undoUp1
     jmp doneGhost1
-undoMoveUp1:
+undoUp1:
     inc ghostY
     jmp doneGhost1
-moveDown1:
+tryDown1:
     inc ghostY
     call isValidGhostMove
     cmp eax, 0
-    je undoMoveDown1
+    je undoDown1
     jmp doneGhost1
-undoMoveDown1:
+undoDown1:
     dec ghostY
+    jmp doneGhost1
+tryLeft1:
+    dec ghostX
+    call isValidGhostMove
+    cmp eax, 0
+    je undoLeft1
+    jmp doneGhost1
+undoLeft1:
+    inc ghostX
+    jmp doneGhost1
+tryRight1:
+    inc ghostX
+    call isValidGhostMove
+    cmp eax, 0
+    je undoRight1
+    jmp doneGhost1
+undoRight1:
+    dec ghostX
 doneGhost1:
-    popad
-    pushad
-    mov al, ghost2X
-    cmp al, playerX
-    je checkY2
-    jl moveRight2
-    jg moveLeft2
-checkY2:
-    mov al, ghost2Y
-    cmp al, playerY
-    je handleCollision2
-    jl moveDown2
-    jg moveUp2
-    jmp doneGhost2
-handleCollision2:
-    dec lives
-    mov playerX, 30
-    mov playerY, 12
-    jmp doneGhost2
-moveRight2:
-    inc ghost2X
-    call isValidGhost2Move
+
+    ; Move Ghost 2
+    call Random32
+    and eax, 3
     cmp eax, 0
-    je undoMoveRight2
-    jmp doneGhost2
-undoMoveRight2:
-    dec ghost2X
-    jmp doneGhost2
-moveLeft2:
-    dec ghost2X
-    call isValidGhost2Move
-    cmp eax, 0
-    je undoMoveLeft2
-    jmp doneGhost2
-undoMoveLeft2:
-    inc ghost2X
-    jmp doneGhost2
-moveUp2:
+    je tryUp2
+    cmp eax, 1
+    je tryDown2
+    cmp eax, 2
+    je tryLeft2
+    jmp tryRight2
+tryUp2:
     dec ghost2Y
     call isValidGhost2Move
     cmp eax, 0
-    je undoMoveUp2
+    je undoUp2
     jmp doneGhost2
-undoMoveUp2:
+undoUp2:
     inc ghost2Y
     jmp doneGhost2
-moveDown2:
+tryDown2:
     inc ghost2Y
     call isValidGhost2Move
     cmp eax, 0
-    je undoMoveDown2
+    je undoDown2
     jmp doneGhost2
-undoMoveDown2:
+undoDown2:
     dec ghost2Y
+    jmp doneGhost2
+tryLeft2:
+    dec ghost2X
+    call isValidGhost2Move
+    cmp eax, 0
+    je undoLeft2
+    jmp doneGhost2
+undoLeft2:
+    inc ghost2X
+    jmp doneGhost2
+tryRight2:
+    inc ghost2X
+    call isValidGhost2Move
+    cmp eax, 0
+    je undoRight2
+    jmp doneGhost2
+undoRight2:
+    dec ghost2X
 doneGhost2:
-    popad
-    pushad
-    mov al, ghost3X
-    cmp al, playerX
-    je checkY3
-    jl moveRight3
-    jg moveLeft3
-checkY3:
-    mov al, ghost3Y
-    cmp al, playerY
-    je handleCollision3
-    jl moveDown3
-    jg moveUp3
-    jmp doneGhost3
-handleCollision3:
-    dec lives
-    mov playerX, 30
-    mov playerY, 12
-    jmp doneGhost3
-moveRight3:
-    inc ghost3X
-    call isValidGhost3Move
+
+    ; Move Ghost 3
+    call Random32
+    and eax, 3
     cmp eax, 0
-    je undoMoveRight3
-    jmp doneGhost3
-undoMoveRight3:
-    dec ghost3X
-    jmp doneGhost3
-moveLeft3:
-    dec ghost3X
-    call isValidGhost3Move
-    cmp eax, 0
-    je undoMoveLeft3
-    jmp doneGhost3
-undoMoveLeft3:
-    inc ghost3X
-    jmp doneGhost3
-moveUp3:
+    je tryUp3
+    cmp eax, 1
+    je tryDown3
+    cmp eax, 2
+    je tryLeft3
+    jmp tryRight3
+tryUp3:
     dec ghost3Y
     call isValidGhost3Move
     cmp eax, 0
-    je undoMoveUp3
+    je undoUp3
     jmp doneGhost3
-undoMoveUp3:
+undoUp3:
     inc ghost3Y
     jmp doneGhost3
-moveDown3:
+tryDown3:
     inc ghost3Y
     call isValidGhost3Move
     cmp eax, 0
-    je undoMoveDown3
+    je undoDown3
     jmp doneGhost3
-undoMoveDown3:
+undoDown3:
     dec ghost3Y
+    jmp doneGhost3
+tryLeft3:
+    dec ghost3X
+    call isValidGhost3Move
+    cmp eax, 0
+    je undoLeft3
+    jmp doneGhost3
+undoLeft3:
+    inc ghost3X
+    jmp doneGhost3
+tryRight3:
+    inc ghost3X
+    call isValidGhost3Move
+    cmp eax, 0
+    je undoRight3
+    jmp doneGhost3
+undoRight3:
+    dec ghost3X
 doneGhost3:
-    popad
+
+skipGhostMove:
     call displayGhost
+    popad
     ret
 moveGhost ENDP
 
@@ -950,6 +946,7 @@ displayLives PROC
 displayLives ENDP
 
 main PROC
+    call initRandom
     call displayWelcome
     call displayMainMenu 
 gameLoop:
@@ -958,14 +955,43 @@ gameLoop:
     call displayPlayer
     call displayScore
     call displayLives
-    call ReadChar
+
+    ; Non-blocking input
+    call ReadKey
+    jz noNewInput
     mov inputChar, al
+    cmp inputChar, 'w'
+    je setInput
+    cmp inputChar, 's'
+    je setInput
+    cmp inputChar, 'a'
+    je setInput
+    cmp inputChar, 'd'
+    je setInput
     cmp inputChar, 'x'
     je gameOver
+    jmp noNewInput
+setInput:
+    mov al, inputChar
+    mov lastInput, al
+noNewInput:
+    mov al, lastInput
+    mov inputChar, al
+
+    ; Player movement with counter
+    inc playerMoveCounter
+    cmp playerMoveCounter, 5   ; Move player every 5th loop (~100ms)
+    jb skipPlayerMove
+    mov playerMoveCounter, 0   ; Reset counter
     call movePlayer
+skipPlayerMove:
+
     call moveGhost
     cmp lives, 0
     je gameOver
+
+    mov eax, 20          ; 20ms delay for smooth updates
+    call Delay
     jmp gameLoop
 gameOver:
     call Clrscr
@@ -975,7 +1001,7 @@ gameOver:
     call WriteString
     mov eax, white
     call SetTextColor
-    call WaitMsg
+    call ReadKey
 main ENDP
 
 END main
