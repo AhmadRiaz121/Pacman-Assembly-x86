@@ -32,6 +32,8 @@ INCLUDE Irvine32.inc
              BYTE "D - Move Right", 0ah
              BYTE "P - Pause Game", 0ah
              BYTE "X - Exit Game", 0ah
+             BYTE "Collect dots (.) for 1 point", 0ah
+             BYTE "Collect fruits (@) for 50 points", 0ah
              BYTE "=================================", 0ah
              BYTE "Press B to return to menu", 0ah, 0
 
@@ -41,20 +43,20 @@ INCLUDE Irvine32.inc
                  BYTE "=================================", 0ah
                  BYTE "Press M to return to menu", 0ah, 0
 
-    ; Level 1 maze (60x25, ~100 pellets, roll number 2583)
+    ; Level 1 maze (60x25) with fruit at (10,5)
     level1Maze BYTE "============================================================", 0ah
            BYTE "|                                                          |", 0ah
            BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
            BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
            BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
-           BYTE "|   #  #   #       #   #  #   #       #   #  #   #     #   |", 0ah
+           BYTE "|   #  #   @....   #   #  #   #       #   #  #   #     #   |", 0ah
            BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
            BYTE "|          #       #          #       #          #     #   |", 0ah
            BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
            BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
            BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
            BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   ####   #### ####   ####   #### ####   ####   ######    |", 0ah
+           BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
            BYTE "|                                                          |", 0ah
            BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
            BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
@@ -69,37 +71,70 @@ INCLUDE Irvine32.inc
            BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
            BYTE "============================================================", 0ah, 0
 
+    ; Level 2 maze with fruit at (20,10)
+    Level2Maze BYTE "########################################################################################", 0ah
+           BYTE "# ...................................................................................  #", 0ah
+           BYTE "# .. ########################## ........########################################## ..  #", 0ah
+           BYTE "# .. ##                                                                         ## ..  #", 0ah
+           BYTE "# .. ##     ############################################         ############ .......  #", 0ah
+           BYTE "# .. ##                                                             ....   ####### ..  #", 0ah
+           BYTE "# .. ##                 ......   #################    .....                     ## ..  #", 0ah
+           BYTE "# .. ## ..  ##       ##############   .......   ##############                  ## ..  #", 0ah
+           BYTE "# .. ## ..  ##                                                                  ## ..  #", 0ah
+           BYTE "# .. ## ..  ##    ###########.@#########..##################..###############   ## ..  #", 0ah
+           BYTE "# .. ## ..  ##                                                                  ## ..  #", 0ah
+           BYTE "# .. ## ..  ##                                                                  ## ..  #", 0ah
+           BYTE "# ........  ##    ###########         #################      ## .      ##       .. ..  #", 0ah
+           BYTE "# .. ## ..  ##                                               ## .      ##       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##       ........                             .. ## .      ##       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##       ########          ## . ##     ## .. ########      ##       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##       ## .. ##          ## . ##     ## .. ## . .        ##       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##       ## .. ##    ######## . ##     ## .. ## .          ##       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##       ## .. ##     .... ## . ##     ######## .          ##       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##                         ## . ##                         ##       ## ..  #", 0ah
+           BYTE "# ........  ##  ######################### . #############################       ## ..  #", 0ah
+           BYTE "# .. ## ..  ##                                                                  ## ..  #", 0ah
+           BYTE "# .. ############################################# ....... ####################### ..  #", 0ah           
+           BYTE "# ...................................................................................  #", 0ah
+           BYTE "########################################################################################", 0
 
-level2Maze BYTE "============================================================", 0ah
-           BYTE "|                                                          |", 0ah
-           BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
-           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
-           BYTE "|   #  #   #       #   #  #   #       #   #  #   #     #   |", 0ah
-           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
-           BYTE "|          #       #          #       #          #     #   |", 0ah
-           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
-           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
-           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   ####   #### ####   ####   #### ####   ####   ######    |", 0ah
-           BYTE "|                                                          |", 0ah
-           BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
-           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
-           BYTE "|   #  #   #       #   #  #   #       #   #  #   #     #   |", 0ah
-           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
-           BYTE "|          #       #          #       #          #     #   |", 0ah
-           BYTE "|   ####   #       #   ####   #       #   ####   #     #   |", 0ah
-           BYTE "|   #  #   ###   ###   #  #   ###   ###   #  #   ### ###   |", 0ah
-           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   #  #   .........   #  #   .........   #  #   .......   |", 0ah
-           BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
-           BYTE "============================================================", 0ah, 0
+    ; Level 3 maze
+    Level3Maze BYTE "########################################################################################", 0ah
+           BYTE "#                                                       ...                            #", 0ah
+           BYTE "#                                                 ...  ######     ##        ######     #", 0ah
+           BYTE "#      #############       ##               ...  ######           ##        ## ..      #", 0ah
+           BYTE "#      ####### .....       ## ...     ...  ######            ...  ##        ## ..      #", 0ah
+           BYTE "#                 ##       ######## .######                 ########        ## ..      #", 0ah
+           BYTE "#######           ##       ##               ...                   ##    ##########     #", 0ah
+           BYTE "# ....            ##       ##   ....       ###### ...             ##                   #", 0ah
+           BYTE "#                 ##       ##    ....       ...  ###### ...                     ### .. #", 0ah
+           BYTE "########## . #########     ##     ....            ...  ######   ########### . ##########", 0ah
+           BYTE "########## . #########                                  ...     ########### . ##########", 0ah
+           BYTE "########## . #########                                          ########### . ##########", 0ah
+           BYTE " .........                      ########################        ...........             ", 0ah
+           BYTE "########## . #########                                          ########### . ##########", 0ah
+           BYTE "########## . #########                                ####      ########### . ##########", 0ah
+           BYTE "########## . #########      ############              .. #      ########### . ##########", 0ah
+           BYTE "#   ..  ##                  ## .................                                       #", 0ah
+           BYTE "#   ..  ##                  ## .### .#############. ####          ##                   #", 0ah
+           BYTE "#   ..  ##  .....           ## .### .#############. ####          ## .#####            #", 0ah
+           BYTE "#   ..  ##########          ## .######## ...... ##. ####          ## .#####            #", 0ah
+           BYTE "#   ####  ...... #####      ## .###### .. ####  ... ####          ## ...........       #", 0ah
+           BYTE "#         ###   ......      ## .###### .################          ##############       #", 0ah
+           BYTE "#           ####                                                    ........  ##       #", 0ah
+           BYTE "#                                                                                      #", 0ah
+           BYTE "########################################################################################", 0 
 
-
-
-
+    ; Game end screen
+    game_end_screen BYTE "  ______    ______   __       __  ________         ______   __     __  ________  _______  ",0ah  
+        BYTE " /      \  /      \ |  \     /  \|        \       /      \ |  \   |  \|        \|       \  ",0ah 
+        BYTE "|  $$$$$$\|  $$$$$$\| $$\   /  $$| $$$$$$$$      |  $$$$$$\| $$   | $$| $$$$$$$$| $$$$$$$\",0ah
+        BYTE "| $$ __\$$| $$__| $$| $$$\ /  $$$| $$__          | $$  | $$| $$   | $$| $$__    | $$__| $$",0ah
+        BYTE "| $$|    \| $$    $$| $$$$\  $$$$| $$  \         | $$  | $$ \$$\ /  $$| $$  \   | $$    $$",0ah
+        BYTE "| $$ \$$$$| $$$$$$$$| $$\$$ $$ $$| $$$$$         | $$  | $$  \$$\  $$ | $$$$$   | $$$$$$$\",0ah
+        BYTE "| $$__| $$| $$  | $$| $$ \$$$| $$| $$_____       | $$__/ $$   \$$ $$  | $$_____ | $$  | $$",0ah
+        BYTE " \$$    $$| $$  | $$| $$  \$ | $$| $$     \       \$$    $$    \$$$   | $$     \| $$  | $$",0ah
+        BYTE "  \$$$$$$  \$$   \$$ \$$      \$$ \$$$$$$$$        \$$$$$$      \$     \$$$$$$$$ \$$   \$$ ",0ah
 
     ; Player variables
     playerX BYTE 30  ; Starting position (30,12)
@@ -116,8 +151,9 @@ level2Maze BYTE "============================================================", 
 
     lives DWORD 3    ; Player lives
     livesMsg BYTE "Lives: ", 0
-    gameOverMsg BYTE "Game Over! Press any key to exit.", 0
+    gameOverMsg BYTE "Game Over! Press/Press any key to exit.", 0
     score DWORD 0    ; Player score
+    currentLevel BYTE 1  ; Tracks current level (1, 2, or 3)
     scoreMsg BYTE "Score: ", 0
 
 .code
@@ -241,7 +277,7 @@ done_scores:
     ret
 displayHighScores ENDP
 
-; Procedure to display Level 1 maze
+; Procedure to display Level maze
 displayLevel PROC
     push ebp
     mov ebp, esp
@@ -250,7 +286,18 @@ displayLevel PROC
     call Gotoxy
     mov eax, green
     call SetTextColor
+    cmp currentLevel, 1
+    je displayLevel1
+    cmp currentLevel, 2
+    je displayLevel2
+    mov edx, OFFSET Level3Maze
+    jmp displayMaze
+displayLevel1:
     mov edx, OFFSET level1Maze
+    jmp displayMaze
+displayLevel2:
+    mov edx, OFFSET Level2Maze
+displayMaze:
     call WriteString
     mov eax, white
     call SetTextColor
@@ -284,10 +331,26 @@ isValidMove PROC
     mov ebp, esp
     movzx eax, playerY
     sub eax, 1
-    imul eax, 61
+    mov ecx, 61                  ; Row length for level 1
+    cmp currentLevel, 1
+    je setRowLength
+    mov ecx, 89                  ; Row length for level 2 and 3
+setRowLength:
+    imul eax, ecx                ; Multiply by row length
     movzx edx, playerX
     add eax, edx
+    cmp currentLevel, 1
+    je checkLevel1
+    cmp currentLevel, 2
+    je checkLevel2
+    mov dl, Level3Maze[eax]
+    jmp checkValid
+checkLevel1:
     mov dl, level1Maze[eax]
+    jmp checkValid
+checkLevel2:
+    mov dl, Level2Maze[eax]
+checkValid:
     cmp dl, '#'
     je invalid
     cmp dl, '|'
@@ -322,7 +385,7 @@ displayScore PROC
     ret
 displayScore ENDP
 
-; Procedure to move player and handle pellet eating
+; Procedure to move player and handle pellet and fruit eating
 movePlayer PROC
     call clearPlayer
 
@@ -379,17 +442,106 @@ undoMoveRight:
     jmp check_pellets
 
 check_pellets:
-    ; Check for pellet at new position
     movzx eax, playerY
     sub eax, 1
-    imul eax, 61
+    mov ecx, 61                  ; Row length for level 1
+    cmp currentLevel, 1
+    je setRowLengthPellet
+    mov ecx, 89                  ; Row length for level 2 and 3
+setRowLengthPellet:
+    imul eax, ecx                ; Multiply by row length
     movzx edx, playerX
     add eax, edx
+    cmp currentLevel, 1
+    je checkLevel1Pellet
+    cmp currentLevel, 2
+    je checkLevel2Pellet
+    mov bl, Level3Maze[eax]
+    cmp bl, '.'
+    je collectPellet
+    cmp bl, '@'
+    je collectFruit
+    jmp check_collisions
+checkLevel1Pellet:
     mov bl, level1Maze[eax]
     cmp bl, '.'
-    jne check_collisions
+    je collectPellet1
+    cmp bl, '@'
+    je collectFruit1
+    jmp check_collisions
+checkLevel2Pellet:
+    mov bl, Level2Maze[eax]
+    cmp bl, '.'
+    je collectPellet2
+    cmp bl, '@'
+    je collectFruit2
+    jmp check_collisions
+collectPellet:
+    mov byte ptr Level3Maze[eax], ' '
+    add score, 1
+    jmp checkLevelTransition
+collectFruit:
+    mov byte ptr Level3Maze[eax], ' '
+    add score, 50
+    jmp checkLevelTransition
+collectPellet1:
     mov byte ptr level1Maze[eax], ' '
-    add score, 5
+    add score, 1
+    jmp checkLevelTransition
+collectFruit1:
+    mov byte ptr level1Maze[eax], ' '
+    add score, 50
+    jmp checkLevelTransition
+collectPellet2:
+    mov byte ptr Level2Maze[eax], ' '
+    add score, 1
+    jmp checkLevelTransition
+collectFruit2:
+    mov byte ptr Level2Maze[eax], ' '
+    add score, 50
+    jmp checkLevelTransition
+
+checkLevelTransition:
+    cmp score, 254
+    jne checkLevel3
+    cmp currentLevel, 1
+    jne checkLevel3
+    mov currentLevel, 2
+    ; Reset player and ghost positions
+    mov playerX, 30
+    mov playerY, 12
+    mov ghostX, 30
+    mov ghostY, 8
+    mov ghost2X, 15
+    mov ghost2Y, 8
+    mov ghost3X, 45
+    mov ghost3Y, 8
+    call clearPlayer
+    call clearGhost
+    call displayLevel
+    call displayGhost
+    call displayPlayer
+    jmp check_collisions
+checkLevel3:
+    cmp score, 680
+    jne check_collisions
+    cmp currentLevel, 2
+    jne check_collisions
+    mov currentLevel, 3
+    ; Reset player and ghost positions
+    mov playerX, 30
+    mov playerY, 12
+    mov ghostX, 30
+    mov ghostY, 8
+    mov ghost2X, 15
+    mov ghost2Y, 8
+    mov ghost3X, 45
+    mov ghost3Y, 8
+    call clearPlayer
+    call clearGhost
+    call displayLevel
+    call displayGhost
+    call displayPlayer
 
 check_collisions:
     ; Check collision with Ghost 1
@@ -661,10 +813,26 @@ isValidGhostMove PROC
     mov ebp, esp
     movzx eax, ghostY
     sub eax, 1
-    imul eax, 61
+    mov ecx, 61                  ; Row length for level 1
+    cmp currentLevel, 1
+    je setRowLengthGhost
+    mov ecx, 89                  ; Row length for level 2 and 3
+setRowLengthGhost:
+    imul eax, ecx                ; Multiply by row length
     movzx edx, ghostX
     add eax, edx
+    cmp currentLevel, 1
+    je checkLevel1Ghost
+    cmp currentLevel, 2
+    je checkLevel2Ghost
+    mov dl, Level3Maze[eax]
+    jmp checkValidGhost
+checkLevel1Ghost:
     mov dl, level1Maze[eax]
+    jmp checkValidGhost
+checkLevel2Ghost:
+    mov dl, Level2Maze[eax]
+checkValidGhost:
     cmp dl, '#'
     je invalid_ghost
     cmp dl, '|'
@@ -686,10 +854,26 @@ isValidGhost2Move PROC
     mov ebp, esp
     movzx eax, ghost2Y
     sub eax, 1
-    imul eax, 61
+    mov ecx, 61                  ; Row length for level 1
+    cmp currentLevel, 1
+    je setRowLengthGhost2
+    mov ecx, 89                  ; Row length for level 2 and 3
+setRowLengthGhost2:
+    imul eax, ecx                ; Multiply by row length
     movzx edx, ghost2X
     add eax, edx
+    cmp currentLevel, 1
+    je checkLevel1Ghost2
+    cmp currentLevel, 2
+    je checkLevel2Ghost2
+    mov dl, Level3Maze[eax]
+    jmp checkValidGhost2
+checkLevel1Ghost2:
     mov dl, level1Maze[eax]
+    jmp checkValidGhost2
+checkLevel2Ghost2:
+    mov dl, Level2Maze[eax]
+checkValidGhost2:
     cmp dl, '#'
     je invalid_ghost2
     cmp dl, '|'
@@ -711,10 +895,26 @@ isValidGhost3Move PROC
     mov ebp, esp
     movzx eax, ghost3Y
     sub eax, 1
-    imul eax, 61
+    mov ecx, 61                  ; Row length for level 1
+    cmp currentLevel, 1
+    je setRowLengthGhost3
+    mov ecx, 89                  ; Row length for level 2 and 3
+setRowLengthGhost3:
+    imul eax, ecx                ; Multiply by row length
     movzx edx, ghost3X
     add eax, edx
+    cmp currentLevel, 1
+    je checkLevel1Ghost3
+    cmp currentLevel, 2
+    je checkLevel2Ghost3
+    mov dl, Level3Maze[eax]
+    jmp checkValidGhost3
+checkLevel1Ghost3:
     mov dl, level1Maze[eax]
+    jmp checkValidGhost3
+checkLevel2Ghost3:
+    mov dl, Level2Maze[eax]
+checkValidGhost3:
     cmp dl, '#'
     je invalid_ghost3
     cmp dl, '|'
@@ -761,7 +961,7 @@ gameLoop:
     call ReadChar
     mov inputChar, al
     cmp inputChar, 'x'
-    je exitGame
+    je gameOver
     call movePlayer
     call moveGhost
     cmp lives, 0
@@ -769,12 +969,13 @@ gameLoop:
     jmp gameLoop
 gameOver:
     call Clrscr
-    mov edx, OFFSET gameOverMsg
+    mov eax, yellow
+    call SetTextColor
+    mov edx, OFFSET game_end_screen
     call WriteString
-    call ReadKey
-exitGame:
-    call Clrscr
-    exit
+    mov eax, white
+    call SetTextColor
+    call WaitMsg
 main ENDP
 
 END main
