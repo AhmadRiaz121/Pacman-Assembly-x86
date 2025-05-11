@@ -125,6 +125,16 @@ INCLUDE Irvine32.inc
            BYTE "#                                                                                      #", 0ah
            BYTE "########################################################################################", 0 
 
+    gameWon BYTE "               ___    ___  ________   ___  ___          ___       __    ________   ________           ___         ", 0ah  
+        BYTE "              |\  \  /  /||\   __  \ |\  \|\  \        |\  \     |\  \ |\   __  \ |\   ___  \        |\  \        ", 0ah  
+        BYTE "              \ \  \/  / /\ \  \|\  \\ \  \\\  \       \ \  \    \ \  \\ \  \|\  \\ \  \\ \  \       \ \  \       ", 0ah  
+        BYTE "               \ \    / /  \ \  \\\  \\ \  \\\  \       \ \  \  __\ \  \\ \  \\\  \\ \  \\ \  \       \ \  \      ", 0ah  
+        BYTE "                \/  /  /    \ \  \\\  \\ \  \\\  \       \ \  \|\__\_\  \\ \  \\\  \\ \  \\ \  \       \ \__\     ", 0ah  
+        BYTE "              __/  / /       \ \_______\\ \_______\       \ \____________\\ \_______\\ \__\\ \__\       \|__|     ", 0ah  
+        BYTE "             |\___/ /         \|_______| \|_______|        \|____________| \|_______| \|__| \|__|           ___   ", 0ah  
+        BYTE "             \|___|/                                                                                       |\__\ ", 0ah   
+        BYTE "                                                                                                           \|__| ", 0  
+
     ; Game end screen
     game_end_screen BYTE "  ______    ______   __       __  ________         ______   __     __  ________  _______  ",0ah  
         BYTE " /      \  /      \ |  \     /  \|        \       /      \ |  \   |  \|        \|       \  ",0ah 
@@ -159,6 +169,7 @@ INCLUDE Irvine32.inc
     scoreMsg BYTE "Score: ", 0
     randomSeed DWORD ?   ; For random number generator
     moveCounter DWORD 0  ; Counter for ghost movement frequency
+    gameWonFlag BYTE 0   ; Flag to indicate game won
 
 .code
 ; Initialize random seed
@@ -288,6 +299,19 @@ done_scores:
     pop ebp
     ret
 displayHighScores ENDP
+
+; Procedure to display game won screen
+displayGameWon PROC
+    call Clrscr
+    mov eax, yellow
+    call SetTextColor
+    mov edx, OFFSET gameWon
+    call WriteString
+    mov eax, white
+    call SetTextColor
+    call ReadKey
+    ret
+displayGameWon ENDP
 
 ; Procedure to display Level maze
 displayLevel PROC
@@ -491,11 +515,11 @@ checkLevel2Pellet:
 collectPellet:
     mov byte ptr Level3Maze[eax], ' '
     add score, 1
-    jmp checkLevelTransition
+    jmp checkWinCondition
 collectFruit:
     mov byte ptr Level3Maze[eax], ' '
     add score, 50
-    jmp checkLevelTransition
+    jmp checkWinCondition
 collectPellet1:
     mov byte ptr level1Maze[eax], ' '
     add score, 1
@@ -512,6 +536,14 @@ collectFruit2:
     mov byte ptr Level2Maze[eax], ' '
     add score, 50
     jmp checkLevelTransition
+
+checkWinCondition:
+    cmp score, 865
+    jne checkLevelTransition
+    cmp currentLevel, 3
+    jne checkLevelTransition
+    mov gameWonFlag, 1
+    jmp doneMove
 
 checkLevelTransition:
     cmp score, 254
@@ -987,12 +1019,19 @@ noNewInput:
 skipPlayerMove:
 
     call moveGhost
+    cmp gameWonFlag, 1
+    je gameWonScreen
     cmp lives, 0
     je gameOver
 
     mov eax, 20          ; 20ms delay for smooth updates
     call Delay
     jmp gameLoop
+
+gameWonScreen:
+    call displayGameWon
+    jmp exitGame
+
 gameOver:
     call Clrscr
     mov eax, yellow
@@ -1002,6 +1041,8 @@ gameOver:
     mov eax, white
     call SetTextColor
     call ReadKey
+
+exitGame:
 main ENDP
 
 END main
