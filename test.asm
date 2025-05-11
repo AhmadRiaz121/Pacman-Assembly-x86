@@ -1,7 +1,7 @@
 INCLUDE Irvine32.inc
 
 .data
-    ; Welcome screen messages 
+    ; Welcome screen messages
     titleMsg BYTE "     ________   ________   ________   _____ ______    ________   ________      ", 0ah
         BYTE "                        |\   __  \ |\   __  \ |\   ____\ |\   _ \  _   \ |\   __  \ |\   ___  \    ", 0ah
         BYTE "                        \ \  \|\  \\ \  \|\  \\ \  \___| \ \  \\\__\ \  \\ \  \|\  \\ \  \\ \  \   ", 0ah
@@ -15,7 +15,7 @@ INCLUDE Irvine32.inc
     playerName BYTE 50 DUP(0)
     nameLength DWORD 0
 
-    ; Main menu messages 
+    ; Main menu messages
     mainMenuMsg BYTE "Welcome, ", 0
     menuOptions BYTE "                    ============================", 0ah
                 BYTE "                    | 1. Start Game            |", 0ah
@@ -24,7 +24,7 @@ INCLUDE Irvine32.inc
                 BYTE "                    ============================", 0ah
                 BYTE "                    Select an option (1-3): ", 0
 
-    ; Instructions screen 
+    ; Instructions screen
     instrMsg BYTE "========== Instructions ==========", 0ah
              BYTE "W - Move Up", 0ah
              BYTE "A - Move Left", 0ah
@@ -37,13 +37,18 @@ INCLUDE Irvine32.inc
              BYTE "=================================", 0ah
              BYTE "Press B to return to menu", 0ah, 0
 
-    ; High score screen 
+    ; High score screen
     highScoreMsg BYTE "========== High Scores ==========", 0ah
                  BYTE "(Scores will be displayed here)", 0ah
                  BYTE "=================================", 0ah
                  BYTE "Press M to return to menu", 0ah, 0
 
-    ; Level 1 maze 
+    ; Pause screen
+    pauseMsg BYTE "========== Game Paused ==========", 0ah
+             BYTE "Press B to resume game", 0ah
+             BYTE "================================", 0ah, 0
+
+    ; Level 1 maze
     level1Maze BYTE "============================================================", 0ah
            BYTE "|                                                          |", 0ah
            BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
@@ -71,7 +76,7 @@ INCLUDE Irvine32.inc
            BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
            BYTE "============================================================", 0ah, 0
 
-    ; Level 2 maze 
+    ; Level 2 maze
     Level2Maze BYTE "########################################################################################", 0ah
            BYTE "# ...................................................................................  #", 0ah
            BYTE "# .. ########################## ........########################################## ..  #", 0ah
@@ -95,10 +100,9 @@ INCLUDE Irvine32.inc
            BYTE "# ........  ##  ######################### . #############################       ## ..  #", 0ah
            BYTE "# .. ## ..  ##                                                                  ## ..  #", 0ah
            BYTE "# .. ############################################# ....... ####################### ..  #", 0ah           
-           BYTE "# ...................................................................................  #", 0ah
            BYTE "########################################################################################", 0
 
-    ; Level 3 maze 
+    ; Level 3 maze
     Level3Maze BYTE "########################################################################################", 0ah
            BYTE "#                                                       ...                            #", 0ah
            BYTE "#                                                 ...  ######     ##        ######     #", 0ah
@@ -135,7 +139,7 @@ INCLUDE Irvine32.inc
         BYTE "             \|___|/                                                                                       |\__\ ", 0ah   
         BYTE "                                                                                                           \|__| ", 0  
 
-    ; Game end screen 
+    ; Game end screen
     game_end_screen BYTE "  ______    ______   __       __  ________         ______   __     __  ________  _______  ",0ah  
         BYTE " /      \  /      \ |  \     /  \|        \       /      \ |  \   |  \|        \|       \  ",0ah 
         BYTE "|  $$$$$$\|  $$$$$$\| $$\   /  $$| $$$$$$$$      |  $$$$$$\| $$   | $$| $$$$$$$$| $$$$$$$\",0ah
@@ -146,7 +150,7 @@ INCLUDE Irvine32.inc
         BYTE " \$$    $$| $$  | $$| $$  \$ | $$| $$     \       \$$    $$    \$$$   | $$     \| $$  | $$",0ah
         BYTE "  \$$$$$$  \$$   \$$ \$$      \$$ \$$$$$$$$        \$$$$$$      \$     \$$$$$$$$ \$$   \$$ ",0ah
 
-    ; Player variables 
+    ; Player variables
     playerX BYTE 30
     playerY BYTE 12
     inputChar BYTE 0
@@ -154,15 +158,15 @@ INCLUDE Irvine32.inc
     playerMoveCounter DWORD 0
 
     ; Ghost variables
-    ghostX BYTE 30   ; Ghost 1
+    ghostX BYTE 30
     ghostY BYTE 8
-    ghost2X BYTE 15  ; Ghost 2
+    ghost2X BYTE 15
     ghost2Y BYTE 8
-    ghost3X BYTE 45  ; Ghost 3
+    ghost3X BYTE 45
     ghost3Y BYTE 8
-    ghost4X BYTE 20  ; Ghost 4 (Level 3 only)
+    ghost4X BYTE 20
     ghost4Y BYTE 8
-    ghost5X BYTE 40  ; Ghost 5 (Level 3 only)
+    ghost5X BYTE 40
     ghost5Y BYTE 8
 
     lives DWORD 3
@@ -176,7 +180,7 @@ INCLUDE Irvine32.inc
     gameWonFlag BYTE 0
 
 .code
-; Initialize random seed 
+; Initialize random seed
 initRandom PROC
     push eax
     call Randomize
@@ -184,7 +188,7 @@ initRandom PROC
     ret
 initRandom ENDP
 
-; Procedure to display welcome screen and get player's name 
+; Procedure to display welcome screen and get player's name
 displayWelcome PROC
     push ebp
     mov ebp, esp
@@ -232,7 +236,7 @@ blinkLoop:
     ret
 displayWelcome ENDP
 
-; Procedure to display the main menu and handle selection 
+; Procedure to display the main menu and handle selection
 displayMainMenu PROC
     push ebp
     mov ebp, esp
@@ -304,6 +308,35 @@ done_scores:
     ret
 displayHighScores ENDP
 
+; Procedure to display pause screen
+displayPauseScreen PROC
+    push ebp
+    mov ebp, esp
+pause_loop:
+    call Clrscr
+    mov eax, yellow
+    call SetTextColor
+    mov edx, OFFSET pauseMsg
+    call WriteString
+    mov eax, white
+    call SetTextColor
+    call ReadChar
+    cmp al, 'B'
+    je done_pause
+    cmp al, 'b'
+    je done_pause
+    jmp pause_loop
+done_pause:
+    call Clrscr
+    call displayLevel
+    call displayGhost
+    call displayPlayer
+    call displayScore
+    call displayLives
+    pop ebp
+    ret
+displayPauseScreen ENDP
+
 ; Procedure to display game won screen
 displayGameWon PROC
     call Clrscr
@@ -345,7 +378,7 @@ displayMaze:
     ret
 displayLevel ENDP
 
-; Procedure to display player 
+; Procedure to display player
 displayPlayer PROC
     mov dl, playerX
     mov dh, playerY
@@ -355,7 +388,7 @@ displayPlayer PROC
     ret
 displayPlayer ENDP
 
-; Procedure to clear the player's previous position 
+; Procedure to clear the player's previous position
 clearPlayer PROC
     mov dl, playerX
     mov dh, playerY
@@ -365,7 +398,7 @@ clearPlayer PROC
     ret
 clearPlayer ENDP
 
-; Procedure to check if the next position is valid 
+; Procedure to check if the next position is valid
 isValidMove PROC
     push ebp
     mov ebp, esp
@@ -406,7 +439,7 @@ done:
     ret
 isValidMove ENDP
 
-; Procedure to display score at fixed position 
+; Procedure to display score at fixed position
 displayScore PROC
     push ebp
     mov ebp, esp
@@ -987,7 +1020,7 @@ skipGhostMove:
     ret
 moveGhost ENDP
 
-; Procedure to validate ghost 1 move 
+; Procedure to validate ghost 1 move
 isValidGhostMove PROC
     push ebp
     mov ebp, esp
@@ -1028,7 +1061,7 @@ done_ghost:
     ret
 isValidGhostMove ENDP
 
-; Procedure to validate ghost 2 move 
+; Procedure to validate ghost 2 move
 isValidGhost2Move PROC
     push ebp
     mov ebp, esp
@@ -1069,7 +1102,7 @@ done_ghost2:
     ret
 isValidGhost2Move ENDP
 
-; Procedure to validate ghost 3 move 
+; Procedure to validate ghost 3 move
 isValidGhost3Move PROC
     push ebp
     mov ebp, esp
@@ -1162,7 +1195,7 @@ done_ghost5:
     ret
 isValidGhost5Move ENDP
 
-; Procedure to display lives at fixed position 
+; Procedure to display lives at fixed position
 displayLives PROC
     push ebp
     mov ebp, esp
@@ -1203,6 +1236,8 @@ gameLoop:
     je setInput
     cmp inputChar, 'd'
     je setInput
+    cmp inputChar, 'p'
+    je pauseGame
     cmp inputChar, 'x'
     je gameOver
     jmp noNewInput
@@ -1228,6 +1263,10 @@ skipPlayerMove:
 
     mov eax, 20
     call Delay
+    jmp gameLoop
+
+pauseGame:
+    call displayPauseScreen
     jmp gameLoop
 
 gameWonScreen:
