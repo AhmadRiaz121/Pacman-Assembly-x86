@@ -1,7 +1,7 @@
 INCLUDE Irvine32.inc
 
 .data
-    ; Welcome screen messages
+    ; Welcome screen messages 
     titleMsg BYTE "     ________   ________   ________   _____ ______    ________   ________      ", 0ah
         BYTE "                        |\   __  \ |\   __  \ |\   ____\ |\   _ \  _   \ |\   __  \ |\   ___  \    ", 0ah
         BYTE "                        \ \  \|\  \\ \  \|\  \\ \  \___| \ \  \\\__\ \  \\ \  \|\  \\ \  \\ \  \   ", 0ah
@@ -12,10 +12,10 @@ INCLUDE Irvine32.inc
     promptMsg BYTE "Press any key to continue...", 0
     blankMsg BYTE "                           ", 0
     namePrompt BYTE "Enter Your Name: ", 0
-    playerName BYTE 50 DUP(0)  ; Buffer for player's name
-    nameLength DWORD 0         ; Length of entered name
+    playerName BYTE 50 DUP(0)
+    nameLength DWORD 0
 
-    ; Main menu messages
+    ; Main menu messages 
     mainMenuMsg BYTE "Welcome, ", 0
     menuOptions BYTE "                    ============================", 0ah
                 BYTE "                    | 1. Start Game            |", 0ah
@@ -24,7 +24,7 @@ INCLUDE Irvine32.inc
                 BYTE "                    ============================", 0ah
                 BYTE "                    Select an option (1-3): ", 0
 
-    ; Instructions screen
+    ; Instructions screen 
     instrMsg BYTE "========== Instructions ==========", 0ah
              BYTE "W - Move Up", 0ah
              BYTE "A - Move Left", 0ah
@@ -37,13 +37,13 @@ INCLUDE Irvine32.inc
              BYTE "=================================", 0ah
              BYTE "Press B to return to menu", 0ah, 0
 
-    ; High score screen (placeholder)
+    ; High score screen 
     highScoreMsg BYTE "========== High Scores ==========", 0ah
                  BYTE "(Scores will be displayed here)", 0ah
                  BYTE "=================================", 0ah
                  BYTE "Press M to return to menu", 0ah, 0
 
-    ; Level 1 maze (60x25) with fruit at (10,5)
+    ; Level 1 maze 
     level1Maze BYTE "============================================================", 0ah
            BYTE "|                                                          |", 0ah
            BYTE "|   ####   .........   ####   .........   ####   .......   |", 0ah
@@ -71,7 +71,7 @@ INCLUDE Irvine32.inc
            BYTE "|   ####   #### ####   ####   #### ####   ####   #######   |", 0ah
            BYTE "============================================================", 0ah, 0
 
-    ; Level 2 maze with fruit at (20,10)
+    ; Level 2 maze 
     Level2Maze BYTE "########################################################################################", 0ah
            BYTE "# ...................................................................................  #", 0ah
            BYTE "# .. ########################## ........########################################## ..  #", 0ah
@@ -98,7 +98,7 @@ INCLUDE Irvine32.inc
            BYTE "# ...................................................................................  #", 0ah
            BYTE "########################################################################################", 0
 
-    ; Level 3 maze
+    ; Level 3 maze 
     Level3Maze BYTE "########################################################################################", 0ah
            BYTE "#                                                       ...                            #", 0ah
            BYTE "#                                                 ...  ######     ##        ######     #", 0ah
@@ -135,7 +135,7 @@ INCLUDE Irvine32.inc
         BYTE "             \|___|/                                                                                       |\__\ ", 0ah   
         BYTE "                                                                                                           \|__| ", 0  
 
-    ; Game end screen
+    ; Game end screen 
     game_end_screen BYTE "  ______    ______   __       __  ________         ______   __     __  ________  _______  ",0ah  
         BYTE " /      \  /      \ |  \     /  \|        \       /      \ |  \   |  \|        \|       \  ",0ah 
         BYTE "|  $$$$$$\|  $$$$$$\| $$\   /  $$| $$$$$$$$      |  $$$$$$\| $$   | $$| $$$$$$$$| $$$$$$$\",0ah
@@ -146,33 +146,37 @@ INCLUDE Irvine32.inc
         BYTE " \$$    $$| $$  | $$| $$  \$ | $$| $$     \       \$$    $$    \$$$   | $$     \| $$  | $$",0ah
         BYTE "  \$$$$$$  \$$   \$$ \$$      \$$ \$$$$$$$$        \$$$$$$      \$     \$$$$$$$$ \$$   \$$ ",0ah
 
-    ; Player variables
-    playerX BYTE 30  ; Starting position (30,12)
+    ; Player variables 
+    playerX BYTE 30
     playerY BYTE 12
     inputChar BYTE 0
-    lastInput BYTE 'd'  ; Default starting direction (right)
-    playerMoveCounter DWORD 0  ; Counter for player movement frequency
+    lastInput BYTE 'd'
+    playerMoveCounter DWORD 0
 
     ; Ghost variables
-    ghostX BYTE 30   ; First ghost at (30,8)
+    ghostX BYTE 30   ; Ghost 1
     ghostY BYTE 8
-    ghost2X BYTE 15  ; Second ghost at (15,8)
+    ghost2X BYTE 15  ; Ghost 2
     ghost2Y BYTE 8
-    ghost3X BYTE 45  ; Third ghost at (45,8)
+    ghost3X BYTE 45  ; Ghost 3
     ghost3Y BYTE 8
+    ghost4X BYTE 20  ; Ghost 4 (Level 3 only)
+    ghost4Y BYTE 8
+    ghost5X BYTE 40  ; Ghost 5 (Level 3 only)
+    ghost5Y BYTE 8
 
-    lives DWORD 3    ; Player lives
+    lives DWORD 3
     livesMsg BYTE "Lives: ", 0
     gameOverMsg BYTE "Game Over! Press any key to exit.", 0
-    score DWORD 0    ; Player score
-    currentLevel BYTE 1  ; Tracks current level (1, 2, or 3)
+    score DWORD 0
+    currentLevel BYTE 1
     scoreMsg BYTE "Score: ", 0
-    randomSeed DWORD ?   ; For random number generator
-    moveCounter DWORD 0  ; Counter for ghost movement frequency
-    gameWonFlag BYTE 0   ; Flag to indicate game won
+    randomSeed DWORD ?
+    moveCounter DWORD 0
+    gameWonFlag BYTE 0
 
 .code
-; Initialize random seed
+; Initialize random seed 
 initRandom PROC
     push eax
     call Randomize
@@ -180,7 +184,7 @@ initRandom PROC
     ret
 initRandom ENDP
 
-; Procedure to display welcome screen and get player's name
+; Procedure to display welcome screen and get player's name 
 displayWelcome PROC
     push ebp
     mov ebp, esp
@@ -228,7 +232,7 @@ blinkLoop:
     ret
 displayWelcome ENDP
 
-; Procedure to display the main menu and handle selection
+; Procedure to display the main menu and handle selection 
 displayMainMenu PROC
     push ebp
     mov ebp, esp
@@ -341,7 +345,7 @@ displayMaze:
     ret
 displayLevel ENDP
 
-; Procedure to display player
+; Procedure to display player 
 displayPlayer PROC
     mov dl, playerX
     mov dh, playerY
@@ -351,7 +355,7 @@ displayPlayer PROC
     ret
 displayPlayer ENDP
 
-; Procedure to clear the player's previous position
+; Procedure to clear the player's previous position 
 clearPlayer PROC
     mov dl, playerX
     mov dh, playerY
@@ -361,18 +365,18 @@ clearPlayer PROC
     ret
 clearPlayer ENDP
 
-; Procedure to check if the next position is valid
+; Procedure to check if the next position is valid 
 isValidMove PROC
     push ebp
     mov ebp, esp
     movzx eax, playerY
     sub eax, 1
-    mov ecx, 61                  ; Row length for level 1
+    mov ecx, 61
     cmp currentLevel, 1
     je setRowLength
-    mov ecx, 89                  ; Row length for level 2 and 3
+    mov ecx, 89
 setRowLength:
-    imul eax, ecx                ; Multiply by row length
+    imul eax, ecx
     movzx edx, playerX
     add eax, edx
     cmp currentLevel, 1
@@ -402,7 +406,7 @@ done:
     ret
 isValidMove ENDP
 
-; Procedure to display score at fixed position
+; Procedure to display score at fixed position 
 displayScore PROC
     push ebp
     mov ebp, esp
@@ -425,7 +429,6 @@ displayScore ENDP
 movePlayer PROC
     call clearPlayer
 
-    ; Check input and move accordingly
     mov al, inputChar
     cmp al, 'w'
     je moveUp
@@ -480,12 +483,12 @@ undoMoveRight:
 check_pellets:
     movzx eax, playerY
     sub eax, 1
-    mov ecx, 61                  ; Row length for level 1
+    mov ecx, 61
     cmp currentLevel, 1
     je setRowLengthPellet
-    mov ecx, 89                  ; Row length for level 2 and 3
+    mov ecx, 89
 setRowLengthPellet:
-    imul eax, ecx                ; Multiply by row length
+    imul eax, ecx
     movzx edx, playerX
     add eax, edx
     cmp currentLevel, 1
@@ -551,7 +554,6 @@ checkLevelTransition:
     cmp currentLevel, 1
     jne checkLevel3
     mov currentLevel, 2
-    ; Reset player and ghost positions
     mov playerX, 30
     mov playerY, 12
     mov ghostX, 30
@@ -572,7 +574,6 @@ checkLevel3:
     cmp currentLevel, 2
     jne check_collisions
     mov currentLevel, 3
-    ; Reset player and ghost positions
     mov playerX, 30
     mov playerY, 12
     mov ghostX, 30
@@ -581,6 +582,10 @@ checkLevel3:
     mov ghost2Y, 8
     mov ghost3X, 45
     mov ghost3Y, 8
+    mov ghost4X, 20
+    mov ghost4Y, 8
+    mov ghost5X, 40
+    mov ghost5Y, 8
     call clearPlayer
     call clearGhost
     call displayLevel
@@ -588,7 +593,6 @@ checkLevel3:
     call displayPlayer
 
 check_collisions:
-    ; Check collision with Ghost 1
     mov bl, playerX
     cmp bl, ghostX
     jne check_ghost2
@@ -601,7 +605,6 @@ check_collisions:
     jmp doneMove
 
 check_ghost2:
-    ; Check collision with Ghost 2
     mov bl, playerX
     cmp bl, ghost2X
     jne check_ghost3
@@ -614,12 +617,39 @@ check_ghost2:
     jmp doneMove
 
 check_ghost3:
-    ; Check collision with Ghost 3
     mov bl, playerX
     cmp bl, ghost3X
-    jne no_collision
+    jne check_ghost4
     mov bl, playerY
     cmp bl, ghost3Y
+    jne check_ghost4
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneMove
+
+check_ghost4:
+    cmp currentLevel, 3
+    jne check_ghost5
+    mov bl, playerX
+    cmp bl, ghost4X
+    jne check_ghost5
+    mov bl, playerY
+    cmp bl, ghost4Y
+    jne check_ghost5
+    dec lives
+    mov playerX, 30
+    mov playerY, 12
+    jmp doneMove
+
+check_ghost5:
+    cmp currentLevel, 3
+    jne no_collision
+    mov bl, playerX
+    cmp bl, ghost5X
+    jne no_collision
+    mov bl, playerY
+    cmp bl, ghost5Y
     jne no_collision
     dec lives
     mov playerX, 30
@@ -654,6 +684,23 @@ displayGhost PROC
     call SetTextColor
     mov al, 'G'
     call WriteChar
+    cmp currentLevel, 3
+    jne skipExtraGhosts
+    mov dl, ghost4X
+    mov dh, ghost4Y
+    call Gotoxy
+    mov eax, yellow + (black SHL 4)
+    call SetTextColor
+    mov al, 'G'
+    call WriteChar
+    mov dl, ghost5X
+    mov dh, ghost5Y
+    call Gotoxy
+    mov eax, gray + (black SHL 4)
+    call SetTextColor
+    mov al, 'G'
+    call WriteChar
+skipExtraGhosts:
     mov eax, white
     call SetTextColor
     ret
@@ -676,6 +723,19 @@ clearGhost PROC
     call Gotoxy
     mov al, ' '
     call WriteChar
+    cmp currentLevel, 3
+    jne skipExtraGhostsClear
+    mov dl, ghost4X
+    mov dh, ghost4Y
+    call Gotoxy
+    mov al, ' '
+    call WriteChar
+    mov dl, ghost5X
+    mov dh, ghost5Y
+    call Gotoxy
+    mov al, ' '
+    call WriteChar
+skipExtraGhostsClear:
     ret
 clearGhost ENDP
 
@@ -684,13 +744,12 @@ moveGhost PROC
     pushad
     call clearGhost
     inc moveCounter
-    cmp moveCounter, 5   ; Move every 5th loop (~100ms)
+    cmp moveCounter, 5
     jb skipGhostMove
-    mov moveCounter, 0   ; Reset counter
+    mov moveCounter, 0
 
-    ; Move Ghost 1
     call Random32
-    and eax, 3           ; Random 0-3 (up, down, left, right)
+    and eax, 3
     cmp eax, 0
     je tryUp1
     cmp eax, 1
@@ -735,7 +794,6 @@ undoRight1:
     dec ghostX
 doneGhost1:
 
-    ; Move Ghost 2
     call Random32
     and eax, 3
     cmp eax, 0
@@ -782,7 +840,6 @@ undoRight2:
     dec ghost2X
 doneGhost2:
 
-    ; Move Ghost 3
     call Random32
     and eax, 3
     cmp eax, 0
@@ -829,24 +886,119 @@ undoRight3:
     dec ghost3X
 doneGhost3:
 
+    cmp currentLevel, 3
+    jne skipExtraGhostsMove
+    call Random32
+    and eax, 3
+    cmp eax, 0
+    je tryUp4
+    cmp eax, 1
+    je tryDown4
+    cmp eax, 2
+    je tryLeft4
+    jmp tryRight4
+tryUp4:
+    dec ghost4Y
+    call isValidGhost4Move
+    cmp eax, 0
+    je undoUp4
+    jmp doneGhost4
+undoUp4:
+    inc ghost4Y
+    jmp doneGhost4
+tryDown4:
+    inc ghost4Y
+    call isValidGhost4Move
+    cmp eax, 0
+    je undoDown4
+    jmp doneGhost4
+undoDown4:
+    dec ghost4Y
+    jmp doneGhost4
+tryLeft4:
+    dec ghost4X
+    call isValidGhost4Move
+    cmp eax, 0
+    je undoLeft4
+    jmp doneGhost4
+undoLeft4:
+    inc ghost4X
+    jmp doneGhost4
+tryRight4:
+    inc ghost4X
+    call isValidGhost4Move
+    cmp eax, 0
+    je undoRight4
+    jmp doneGhost4
+undoRight4:
+    dec ghost4X
+doneGhost4:
+
+    call Random32
+    and eax, 3
+    cmp eax, 0
+    je tryUp5
+    cmp eax, 1
+    je tryDown5
+    cmp eax, 2
+    je tryLeft5
+    jmp tryRight5
+tryUp5:
+    dec ghost5Y
+    call isValidGhost5Move
+    cmp eax, 0
+    je undoUp5
+    jmp doneGhost5
+undoUp5:
+    inc ghost5Y
+    jmp doneGhost5
+tryDown5:
+    inc ghost5Y
+    call isValidGhost5Move
+    cmp eax, 0
+    je undoDown5
+    jmp doneGhost5
+undoDown5:
+    dec ghost5Y
+    jmp doneGhost5
+tryLeft5:
+    dec ghost5X
+    call isValidGhost5Move
+    cmp eax, 0
+    je undoLeft5
+    jmp doneGhost5
+undoLeft5:
+    inc ghost5X
+    jmp doneGhost5
+tryRight5:
+    inc ghost5X
+    call isValidGhost5Move
+    cmp eax, 0
+    je undoRight5
+    jmp doneGhost5
+undoRight5:
+    dec ghost5X
+doneGhost5:
+
+skipExtraGhostsMove:
 skipGhostMove:
     call displayGhost
     popad
     ret
 moveGhost ENDP
 
-; Procedure to validate ghost 1 move
+; Procedure to validate ghost 1 move 
 isValidGhostMove PROC
     push ebp
     mov ebp, esp
     movzx eax, ghostY
     sub eax, 1
-    mov ecx, 61                  ; Row length for level 1
+    mov ecx, 61
     cmp currentLevel, 1
     je setRowLengthGhost
-    mov ecx, 89                  ; Row length for level 2 and 3
+    mov ecx, 89
 setRowLengthGhost:
-    imul eax, ecx                ; Multiply by row length
+    imul eax, ecx
     movzx edx, ghostX
     add eax, edx
     cmp currentLevel, 1
@@ -876,18 +1028,18 @@ done_ghost:
     ret
 isValidGhostMove ENDP
 
-; Procedure to validate ghost 2 move
+; Procedure to validate ghost 2 move 
 isValidGhost2Move PROC
     push ebp
     mov ebp, esp
     movzx eax, ghost2Y
     sub eax, 1
-    mov ecx, 61                  ; Row length for level 1
+    mov ecx, 61
     cmp currentLevel, 1
     je setRowLengthGhost2
-    mov ecx, 89                  ; Row length for level 2 and 3
+    mov ecx, 89
 setRowLengthGhost2:
-    imul eax, ecx                ; Multiply by row length
+    imul eax, ecx
     movzx edx, ghost2X
     add eax, edx
     cmp currentLevel, 1
@@ -917,18 +1069,18 @@ done_ghost2:
     ret
 isValidGhost2Move ENDP
 
-; Procedure to validate ghost 3 move
+; Procedure to validate ghost 3 move 
 isValidGhost3Move PROC
     push ebp
     mov ebp, esp
     movzx eax, ghost3Y
     sub eax, 1
-    mov ecx, 61                  ; Row length for level 1
+    mov ecx, 61
     cmp currentLevel, 1
     je setRowLengthGhost3
-    mov ecx, 89                  ; Row length for level 2 and 3
+    mov ecx, 89
 setRowLengthGhost3:
-    imul eax, ecx                ; Multiply by row length
+    imul eax, ecx
     movzx edx, ghost3X
     add eax, edx
     cmp currentLevel, 1
@@ -958,7 +1110,59 @@ done_ghost3:
     ret
 isValidGhost3Move ENDP
 
-; Procedure to display lives at fixed position
+; Procedure to validate ghost 4 move
+isValidGhost4Move PROC
+    push ebp
+    mov ebp, esp
+    movzx eax, ghost4Y
+    sub eax, 1
+    mov ecx, 89
+    imul eax, ecx
+    movzx edx, ghost4X
+    add eax, edx
+    mov dl, Level3Maze[eax]
+    cmp dl, '#'
+    je invalid_ghost4
+    cmp dl, '|'
+    je invalid_ghost4
+    cmp dl, '='
+    je invalid_ghost4
+    mov eax, 1
+    jmp done_ghost4
+invalid_ghost4:
+    mov eax, 0
+done_ghost4:
+    pop ebp
+    ret
+isValidGhost4Move ENDP
+
+; Procedure to validate ghost 5 move
+isValidGhost5Move PROC
+    push ebp
+    mov ebp, esp
+    movzx eax, ghost5Y
+    sub eax, 1
+    mov ecx, 89
+    imul eax, ecx
+    movzx edx, ghost5X
+    add eax, edx
+    mov dl, Level3Maze[eax]
+    cmp dl, '#'
+    je invalid_ghost5
+    cmp dl, '|'
+    je invalid_ghost5
+    cmp dl, '='
+    je invalid_ghost5
+    mov eax, 1
+    jmp done_ghost5
+invalid_ghost5:
+    mov eax, 0
+done_ghost5:
+    pop ebp
+    ret
+isValidGhost5Move ENDP
+
+; Procedure to display lives at fixed position 
 displayLives PROC
     push ebp
     mov ebp, esp
@@ -988,7 +1192,6 @@ gameLoop:
     call displayScore
     call displayLives
 
-    ; Non-blocking input
     call ReadKey
     jz noNewInput
     mov inputChar, al
@@ -1010,11 +1213,10 @@ noNewInput:
     mov al, lastInput
     mov inputChar, al
 
-    ; Player movement with counter
     inc playerMoveCounter
-    cmp playerMoveCounter, 5   ; Move player every 5th loop (~100ms)
+    cmp playerMoveCounter, 5
     jb skipPlayerMove
-    mov playerMoveCounter, 0   ; Reset counter
+    mov playerMoveCounter, 0
     call movePlayer
 skipPlayerMove:
 
@@ -1024,7 +1226,7 @@ skipPlayerMove:
     cmp lives, 0
     je gameOver
 
-    mov eax, 20          ; 20ms delay for smooth updates
+    mov eax, 20
     call Delay
     jmp gameLoop
 
