@@ -1,4 +1,10 @@
 INCLUDE Irvine32.inc
+includelib Winmm.lib
+
+PlaySound PROTO,
+        pszSound:PTR BYTE, 
+        hmod:DWORD, 
+        fdwSound:DWORD
 
 .data
     ; Welcome screen messages
@@ -178,6 +184,11 @@ INCLUDE Irvine32.inc
     randomSeed DWORD ?
     moveCounter DWORD 0
     gameWonFlag BYTE 0
+    beginSound db ".\startSound.wav",0
+    pacmandeath db ".\DeathSound.wav",0
+    foodsound db ".\FoodSound.wav",0
+    wakasound db ".\WakaSound.wav",0
+    gameOverSound db ".\GameOverSound.wav",0
 
 .code
 ; Initialize random seed
@@ -200,6 +211,8 @@ displayWelcome PROC
     call Gotoxy
     mov edx, OFFSET titleMsg
     call WriteString
+    ; Play start sound
+    INVOKE PlaySound, OFFSET beginSound, NULL, 11h
 blinkLoop:
     mov dl, 20
     mov dh, 13
@@ -551,26 +564,32 @@ checkLevel2Pellet:
 collectPellet:
     mov byte ptr Level3Maze[eax], ' '
     add score, 1
+    INVOKE PlaySound, OFFSET wakasound, NULL, 11h
     jmp checkWinCondition
 collectFruit:
     mov byte ptr Level3Maze[eax], ' '
     add score, 50
+    INVOKE PlaySound, OFFSET foodsound, NULL, 11h
     jmp checkWinCondition
 collectPellet1:
     mov byte ptr level1Maze[eax], ' '
     add score, 1
+    INVOKE PlaySound, OFFSET wakasound, NULL, 11h
     jmp checkLevelTransition
 collectFruit1:
     mov byte ptr level1Maze[eax], ' '
     add score, 50
+    INVOKE PlaySound, OFFSET foodsound, NULL, 11h
     jmp checkLevelTransition
 collectPellet2:
     mov byte ptr Level2Maze[eax], ' '
     add score, 1
+    INVOKE PlaySound, OFFSET wakasound, NULL, 11h
     jmp checkLevelTransition
 collectFruit2:
     mov byte ptr Level2Maze[eax], ' '
     add score, 50
+    INVOKE PlaySound, OFFSET foodsound, NULL, 11h
     jmp checkLevelTransition
 
 checkWinCondition:
@@ -633,6 +652,7 @@ check_collisions:
     cmp bl, ghostY
     jne check_ghost2
     dec lives
+    INVOKE PlaySound, OFFSET pacmandeath, NULL, 11h
     mov playerX, 30
     mov playerY, 12
     jmp doneMove
@@ -645,6 +665,7 @@ check_ghost2:
     cmp bl, ghost2Y
     jne check_ghost3
     dec lives
+    INVOKE PlaySound, OFFSET pacmandeath, NULL, 11h
     mov playerX, 30
     mov playerY, 12
     jmp doneMove
@@ -657,6 +678,7 @@ check_ghost3:
     cmp bl, ghost3Y
     jne check_ghost4
     dec lives
+    INVOKE PlaySound, OFFSET pacmandeath, NULL, 11h
     mov playerX, 30
     mov playerY, 12
     jmp doneMove
@@ -671,6 +693,7 @@ check_ghost4:
     cmp bl, ghost4Y
     jne check_ghost5
     dec lives
+    INVOKE PlaySound, OFFSET pacmandeath, NULL, 11h
     mov playerX, 30
     mov playerY, 12
     jmp doneMove
@@ -685,6 +708,7 @@ check_ghost5:
     cmp bl, ghost5Y
     jne no_collision
     dec lives
+    INVOKE PlaySound, OFFSET pacmandeath, NULL, 11h
     mov playerX, 30
     mov playerY, 12
 
@@ -1279,6 +1303,7 @@ gameOver:
     call SetTextColor
     mov edx, OFFSET game_end_screen
     call WriteString
+    INVOKE PlaySound, OFFSET gameOverSound, NULL, 11h
     mov eax, white
     call SetTextColor
     call ReadKey
