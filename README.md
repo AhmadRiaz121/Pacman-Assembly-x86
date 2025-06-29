@@ -62,7 +62,6 @@ This is a console-based Pac-Man game implemented in x86 Assembly language using 
 - **High Scores**: Not fully implemented; displays a placeholder message.
 - **Ghost Movement**: Random movement may not challenge skilled players.
 - **Sound Dependency**: Missing `.wav` files will prevent sound playback but not affect gameplay.
-- **Console-Based**: Limited to ASCII graphics, no GUI.
 
 ## Future Improvements
 - Implement high score saving and loading.
