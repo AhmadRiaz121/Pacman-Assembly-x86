@@ -21,7 +21,7 @@ This is a console-based Pac-Man game implemented in x86 Assembly language using 
 ## Setup Instructions
 1. **Install MASM**: Set up MASM in your development environment (e.g., Visual Studio).
 2. **Install Irvine32 Library**:
-   - Download the Irvine32 library from [Kip Irvine's website](http://kipirvine.com/asm/) or a trusted source.
+   - Download the Irvine32 library
    - Place `Irvine32.inc` and `Irvine32.lib` in your project directory.
    - Link `Winmm.lib` for sound functionality.
 3. **Add Sound Files**: Place the required `.wav` files in the same directory as `pacman.asm`.
