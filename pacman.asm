@@ -1309,6 +1309,7 @@ gameOver:
     call ReadKey
 
 exitGame:
+    exit
 main ENDP
 
 END main
